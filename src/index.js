@@ -18,10 +18,7 @@ const simpleMiddleWare = (req, res, next) => {
   next();
 };
 
-app.use(simpleMiddleWare)
-
-
-
+// app.use(simpleMiddleWare);
 
 // SECTION: API CALLS
 
@@ -42,11 +39,17 @@ app.get('/api/users', (req, res) => {
 });
 
 app.get('/api/user/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  if (isNaN(id)) return res.sendStatus(400).send({ msg: 'ID is not a number' });
-  const user = mockUsers.find((user) => user.id === id);
+  const {
+    body,
+    params: { id },
+  } = req;
 
-  if (!user) return res.sendStatus(404);
+  const parseID = parseInt(id);
+  if (isNaN(parseID)) return res.sendStatus(400);
+  const userIndex = mockUsers.findIndex((user) => user.id === parseID);
+  if (userIndex === -1) return res.sendStatus(400);
+
+  const user = mockUsers[userIndex];
   return res.send(user);
 });
 
