@@ -1,6 +1,7 @@
 // const express = require('express');
 import express from 'express';
-import { query, validationResult, body, matchedData } from 'express-validator';
+import { query, validationResult, body, matchedData, checkSchema } from 'express-validator';
+import { createUserValidator } from './utils/validatorSchema.js';
 const app = express();
 app.use(express.json());
 
@@ -71,28 +72,15 @@ app.get('/api/user/:id', (req, res) => {
   return res.send(user);
 });
 
-app.post(
-  '/api/users',
-  [
-    body('name').isString().withMessage('Name must be String').notEmpty().withMessage('Name must not be empty'),
-    body('location')
-      .isString()
-      .withMessage('location must be String')
-      .notEmpty()
-      .withMessage('location must not be empty')
-      .isLength({ min: 3, max: 3 })
-      .withMessage('Location code must be 3 characters'),
-  ],
-  (req, res) => {
-    const result = validationResult(req);
-    if (!result.isEmpty()) return res.status(400).send({ errors: result.array() });
+app.post('/api/users', checkSchema(createUserValidator), (req, res) => {
+  const result = validationResult(req);
+  if (!result.isEmpty()) return res.status(400).send({ errors: result.array() });
 
-    const newUser = matchedData(req);
-    newUser['id'] = mockUsers.length + 1;
-    mockUsers.push(newUser);
-    return res.status(200).send(newUser);
-  }
-);
+  const newUser = matchedData(req);
+  newUser['id'] = mockUsers.length + 1;
+  mockUsers.push(newUser);
+  return res.status(200).send(newUser);
+});
 
 app.put('/api/user/:id', (req, res) => {
   const {
