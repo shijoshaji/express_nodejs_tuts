@@ -1,4 +1,6 @@
-const express = require('express');
+// const express = require('express');
+import express from 'express';
+import { query, validationResult, body } from 'express-validator';
 const app = express();
 app.use(express.json());
 
@@ -27,16 +29,32 @@ app.get('/', (req, res) => {
   res.send('Welcome');
 });
 
-app.get('/api/users', (req, res) => {
-  const {
-    query: { filter, value },
-  } = req;
-
-  // Eg query param: http://localhost:3000/api/users?filter=name&value=Ja
-  if (filter && value) return res.send(mockUsers.filter((user) => user[filter].includes(value)));
-  // When filter and values are undefined
+app.get('/api/users/getAllUser', (req, res) => {
   return res.send(mockUsers);
 });
+
+app.get(
+  '/api/users',
+  query('value')
+    .isString()
+    .withMessage('Must be String')
+    .notEmpty()
+    .withMessage('Not Empty')
+    .isLength({ min: 2, max: 5 })
+    .withMessage('Expected minimum of 2 characters'),
+  (req, res) => {
+    const {
+      query: { filter, value },
+    } = req;
+    const result = validationResult(req);
+    if (result.isEmpty()) {
+      // return res.send({ msg: 'Show values' }).status(200);
+      return res.send(mockUsers.filter((user) => user[filter].includes(value))).status(200);
+    } else {
+      return res.status(400).send({ errors: result.array() });
+    }
+  }
+);
 
 app.get('/api/user/:id', (req, res) => {
   const {
@@ -53,12 +71,25 @@ app.get('/api/user/:id', (req, res) => {
   return res.send(user);
 });
 
-app.post('/api/users', (req, res) => {
-  const newUser = req.body;
-  newUser['id'] = mockUsers.length + 1;
-  mockUsers.push(newUser);
-  return res.status(200).send(newUser);
-});
+app.post(
+  '/api/users',
+  body('name').isString().withMessage('Name must be String').notEmpty().withMessage('Name must not be empty'),
+  body('location')
+    .isString()
+    .withMessage('location must be String')
+    .notEmpty()
+    .withMessage('location must not be empty')
+    .isLength({ min: 3, max: 3 })
+    .withMessage('Location code must be 3 characters'),
+  (req, res) => {
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.status(400).send({ errors: result.array() });
+    const newUser = req.body;
+    newUser['id'] = mockUsers.length + 1;
+    mockUsers.push(newUser);
+    return res.status(200).send(newUser);
+  }
+);
 
 app.put('/api/user/:id', (req, res) => {
   const {
