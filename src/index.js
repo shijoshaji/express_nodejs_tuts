@@ -73,14 +73,16 @@ app.get('/api/user/:id', (req, res) => {
 
 app.post(
   '/api/users',
-  body('name').isString().withMessage('Name must be String').notEmpty().withMessage('Name must not be empty'),
-  body('location')
-    .isString()
-    .withMessage('location must be String')
-    .notEmpty()
-    .withMessage('location must not be empty')
-    .isLength({ min: 3, max: 3 })
-    .withMessage('Location code must be 3 characters'),
+  [
+    body('name').isString().withMessage('Name must be String').notEmpty().withMessage('Name must not be empty'),
+    body('location')
+      .isString()
+      .withMessage('location must be String')
+      .notEmpty()
+      .withMessage('location must not be empty')
+      .isLength({ min: 3, max: 3 })
+      .withMessage('Location code must be 3 characters'),
+  ],
   (req, res) => {
     const result = validationResult(req);
     if (!result.isEmpty()) return res.status(400).send({ errors: result.array() });
