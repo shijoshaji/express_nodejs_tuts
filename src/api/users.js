@@ -7,8 +7,8 @@ const userRoute = Router();
 const API_PATH = '/api/users';
 
 userRoute.get(`${API_PATH}/getAllUser`, (req, res) => {
-  console.log(req.session)
-  console.log(req.sessionID)
+  console.log(req.session);
+  console.log(req.sessionID);
   return res.send(mockUsers);
 });
 
