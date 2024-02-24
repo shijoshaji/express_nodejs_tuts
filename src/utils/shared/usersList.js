@@ -5,3 +5,11 @@ export const mockUsers = [
   { id: 4, name: 'Pearl', location: 'CEH' },
   { id: 5, name: 'Bob', location: 'DEL' },
 ];
+
+export const mockUserCredentials = [
+  { id: 1, username: 'James', password: 'JamesBLR' },
+  { id: 2, username: 'Jane', password: 'JaneHYD' },
+  { id: 3, username: 'Shijo', password: 'ShijoTVM' },
+  { id: 4, username: 'Pearl', password: 'PearlCEH' },
+  { id: 5, username: 'Bob', password: 'BobDEL' },
+];
