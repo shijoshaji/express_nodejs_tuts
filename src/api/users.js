@@ -4,13 +4,14 @@ import { createUserValidator } from '../utils/shared/validatorSchema.js';
 import { mockUsers } from '../utils/shared/usersList.js';
 
 const userRoute = Router();
+const API_PATH = '/api/users';
 
-userRoute.get('/api/users/getAllUser', (req, res) => {
+userRoute.get(`${API_PATH}/getAllUser`, (req, res) => {
   return res.send(mockUsers);
 });
 
 userRoute.get(
-  '/api/users',
+  `${API_PATH}`,
   query('value')
     .isString()
     .withMessage('Must be String')
@@ -32,7 +33,7 @@ userRoute.get(
   }
 );
 
-userRoute.get('/api/user/:id', (req, res) => {
+userRoute.get(`${API_PATH}/:id`, (req, res) => {
   const {
     body,
     params: { id },
@@ -47,7 +48,7 @@ userRoute.get('/api/user/:id', (req, res) => {
   return res.send(user);
 });
 
-userRoute.post('/api/users', checkSchema(createUserValidator), (req, res) => {
+userRoute.post(`${API_PATH}`, checkSchema(createUserValidator), (req, res) => {
   const result = validationResult(req);
   if (!result.isEmpty()) return res.status(400).send({ errors: result.array() });
 
@@ -57,7 +58,7 @@ userRoute.post('/api/users', checkSchema(createUserValidator), (req, res) => {
   return res.status(200).send(newUser);
 });
 
-userRoute.put('/api/user/:id', (req, res) => {
+userRoute.put(`${API_PATH}/:id`, (req, res) => {
   const {
     body,
     params: { id },
@@ -71,7 +72,7 @@ userRoute.put('/api/user/:id', (req, res) => {
   return res.sendStatus(200);
 });
 
-userRoute.delete('/api/user/:id', (req, res) => {
+userRoute.delete(`${API_PATH}/:id`, (req, res) => {
   const {
     body,
     params: { id },
