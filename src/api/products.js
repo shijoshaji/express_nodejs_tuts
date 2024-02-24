@@ -6,7 +6,9 @@ import { mockProducts } from '../utils/shared/productList.js';
 const productRoute = Router();
 
 productRoute.get('/api/product/getAllProducts', (req, res) => {
-  return res.send(mockProducts);
+  // NOTE: here we show products if there is cookie
+  if (req.cookies && req.cookies.User == 'Shijo') return res.send(mockProducts);
+  return res.status(403).send({ msg: 'Access Denied' });
 });
 
 export default productRoute;
