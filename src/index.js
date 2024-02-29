@@ -4,8 +4,12 @@ import routes from './app/routes.js';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { mockUserCredentials } from './utils/shared/usersList.js';
+import passport from 'passport';
+import './strategies/local-strategy.js';
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -18,10 +22,11 @@ app.use(
     },
   })
 );
-// Above ones must be initiliased before calling routes
-app.use(routes);
+app.use(passport.initialize());
+app.use(passport.session());
 
-const PORT = process.env.PORT || 3000;
+// NOTE: Above ones must be initiliased before calling routes
+app.use(routes);
 
 app.get('/', (req, res) => {
   // setting cookies
@@ -30,7 +35,7 @@ app.get('/', (req, res) => {
   res.send('Welcome');
 });
 
-// AUTH
+// SECTION: SIMPLE AUTH
 app.post('/api/auth', (req, res) => {
   const {
     body: { username, password },
@@ -53,6 +58,28 @@ app.get('/api/auth/status', (req, res) => {
   return req.session.sessionUser
     ? res.status(200).send(req.session.sessionUser)
     : res.status(401).send({ msg: 'Bad Credentials' });
+});
+// !SECTION
+
+// SECTION: Passport AUTH
+app.post('/api/passport/auth/login', passport.authenticate('local'), (req, res) => {
+  // console.log('PASSPORT AUTH', res);
+  res.status(200).send('Passport Auth Login');
+});
+
+app.post('/api/passport/auth/logout', (req, res) => {
+  console.log('PASSPORT AUTH Logout', req.user);
+  if (!req.user) return res.sendStatus(401);
+  req.logout((err) => {
+    if (err) return res.sendStatus(400);
+    res.status(200).send('Passport Auth Logout');
+  });
+});
+
+app.get('/api/passport/auth/status', (req, res) => {
+  console.log('Inside passport/auth/status', req.user);
+  if (req.user) return res.status(200).send('isLoggedIN');
+  return res.status(401).send('isNotLoggedIN');
 });
 
 // NOTE: PORT CALL
