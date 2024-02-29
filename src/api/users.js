@@ -1,11 +1,14 @@
 import { Router } from 'express';
 import { query, validationResult, body, matchedData, checkSchema } from 'express-validator';
-import { createUserValidator } from '../utils/shared/validatorSchema.js';
+import { creatDBUserValidator, createUserValidator } from '../utils/shared/validatorSchema.js';
 import { mockUsers } from '../utils/shared/usersList.js';
+import { userModel } from '../utils/mongoose/schemas/user.schema.js';
 
 const userRoute = Router();
 const API_PATH = '/api/users';
+const API_PATH_DB = '/db/api/users';
 
+// SECTION: Using index_old.js
 userRoute.get(`${API_PATH}/getAllUser`, (req, res) => {
   console.log(req.session);
   console.log(req.sessionID);
@@ -86,5 +89,27 @@ userRoute.delete(`${API_PATH}/:id`, (req, res) => {
   mockUsers.splice(userIndex, 1);
   return res.sendStatus(200);
 });
+// !SECTION
+
+// SECTION using mongo DB
+userRoute.post(`${API_PATH_DB}`, checkSchema(creatDBUserValidator), async (req, res) => {
+  // const { body } = req;
+  const result = validationResult(req);
+  if (!result.isEmpty()) return res.status(400).send({ errors: result.array() });
+
+  const data = matchedData(req);
+
+  const newUser = new userModel(data);
+  try {
+    const savedUser = await newUser.save();
+    return res.status(201).send({ msg: 'Created New User', data: savedUser });
+  } catch (err) {
+    console.log(err);
+    if (err.code === 11000) return res.status(400).send({ msg: `${newUser.username} already exists` });
+    return res.sendStatus(400);
+  }
+});
+
+// !SECTION
 
 export default userRoute;

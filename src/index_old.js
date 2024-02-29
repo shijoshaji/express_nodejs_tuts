@@ -1,4 +1,4 @@
-// const express = require('express');
+// NOTE: This is simple API without using DB (mongo)
 import express from 'express';
 import routes from './app/routes.js';
 import cookieParser from 'cookie-parser';
@@ -6,17 +6,8 @@ import session from 'express-session';
 import { mockUserCredentials } from './utils/shared/usersList.js';
 import passport from 'passport';
 import './strategies/local-strategy.js';
-import mongoose from 'mongoose';
-import { config } from './app.config.js';
 
 const app = express();
-
-const dbURI = `${config.DB_PATH}${config.DB_HOST}:${config.DB_PORT}/${config.DB_NAME}`;
-
-mongoose
-  .connect(dbURI)
-  .then(() => console.log('DB Connected!'))
-  .catch((err) => console.log(err));
 
 const PORT = process.env.PORT || 3000;
 

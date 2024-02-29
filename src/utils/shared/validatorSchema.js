@@ -17,3 +17,21 @@ export const createUserValidator = {
     },
   },
 };
+
+export const creatDBUserValidator = {
+  username: {
+    isLength: { options: { min: 3, max: 10 }, errorMessage: 'username code must be 3 characters' },
+    notEmpty: {
+      errorMessage: 'username must not be empty',
+    },
+    isString: {
+      errorMessage: 'username must be String',
+    },
+  },
+  password: {
+    notEmpty: {
+      errorMessage: 'password must not be empty',
+    },
+    isLength: { options: { min: 3, max: 10 }, errorMessage: 'password code must be 3 - 10 characters' },
+  },
+};
