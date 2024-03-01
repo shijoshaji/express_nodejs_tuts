@@ -3,6 +3,7 @@ import { query, validationResult, body, matchedData, checkSchema } from 'express
 import { creatDBUserValidator, createUserValidator } from '../utils/shared/validatorSchema.js';
 import { mockUsers } from '../utils/shared/usersList.js';
 import { userModel } from '../utils/mongoose/schemas/user.schema.js';
+import { hashPassword } from '../utils/helpers.js';
 
 const userRoute = Router();
 const API_PATH = '/api/users';
@@ -98,7 +99,7 @@ userRoute.post(`${API_PATH_DB}`, checkSchema(creatDBUserValidator), async (req, 
   if (!result.isEmpty()) return res.status(400).send({ errors: result.array() });
 
   const data = matchedData(req);
-
+  data.password = hashPassword(data.password)
   const newUser = new userModel(data);
   try {
     const savedUser = await newUser.save();
